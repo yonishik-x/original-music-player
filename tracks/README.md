@@ -10,3 +10,4 @@
 | 2026-11-19 | PERPETUAL HORIZON | [2026-11-19-perpetual-horizon.md](2026-11-19-perpetual-horizon.md) |
 | 2026-11-19 | NORTH OF THE VALLEY | [2026-11-19-north-of-the-valley.md](2026-11-19-north-of-the-valley.md) |
 | 2026-11-19 | ACROSS THE HIGH RIDGE | [2026-11-19-across-the-high-ridge.md](2026-11-19-across-the-high-ridge.md) |
+| 2026-11-19 | STEPS IN THE SUN | [2026-11-19-steps-in-the-sun.md](2026-11-19-steps-in-the-sun.md) |
