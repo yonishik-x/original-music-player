@@ -223,6 +223,7 @@
           <div class="track-switch" id="trackSwitch" role="group" aria-label="曲の切り替え">
             <button data-track="0" aria-pressed="true"><span class="ts-name">INTERSECTION AT DAYBREAK</span><span class="ts-desc">ジャズピアノ・124 BPM</span></button>
             <button data-track="1" aria-pressed="false"><span class="ts-name">Before the Final Bell</span><span class="ts-desc">ピアノ協奏曲風</span></button>
+            <button data-track="2" aria-pressed="false"><span class="ts-name">COFFEE AND GOLD</span><span class="ts-desc">ピアノポップ・120 BPM</span></button>
           </div>
           <h1 class="track-title" id="trackTitle">INTERSECTION AT DAYBREAK</h1>
           <p class="track-sub" id="trackSub">アップテンポ・ジャズピアノ — 仕事の集中用BGM（歌詞なし）</p>
@@ -329,9 +330,10 @@
       </section>
 
       <section class="about">
-        <p>収録曲は2曲とも Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。プレーヤーはプレイリスト再生に対応し、リピートは全曲・1曲・なしから選べます（前後の曲への移動ボタン付き）。音源はページを開いた時点で全曲を読み込むため、再生中に追加の通信は発生しません。</p>
+        <p>収録曲は3曲とも Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。プレーヤーはプレイリスト再生に対応し、リピートは全曲・1曲・なしから選べます（前後の曲への移動ボタン付き）。音源はページを開いた時点で全曲を読み込むため、再生中に追加の通信は発生しません。</p>
         <p>1. INTERSECTION AT DAYBREAK（ジャズピアノ）：<a href="https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/jWwyIXZohye4" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
         <p>2. Before the Final Bell（ピアノ協奏曲風）：<a href="https://drive.google.com/file/d/14Y5sQvIoQf9ODP9jiGtD22AqzMclq_oL/view" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/ncgEleilLrru" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
+        <p>3. COFFEE AND GOLD（ピアノポップ）：<a href="https://drive.google.com/file/d/1IqC3SHuxFQeS5UaiqLzywj5rPbTbmwAe/view" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/GNDUMs0rT6Ic" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
       </section>
 
     </main>
@@ -362,6 +364,14 @@
             chips: ["ピアノ協奏曲風", "ピアノ＋弦楽オーケストラ", "2:59"],
             len: 179.20,
             parts: "parts-bell.txt"
+          },
+          {
+            id: "coffee",
+            title: "COFFEE AND GOLD",
+            sub: "ピアノポップ — 朝一番に元気が出る、明るく元気な曲（歌詞なし）",
+            chips: ["120 BPM", "ピアノ＋ドラム＋ベース", "2:59"],
+            len: 179.91,
+            parts: "parts-coffee.txt"
           }
         ];
         var curTrack = 0;
