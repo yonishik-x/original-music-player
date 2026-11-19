@@ -329,7 +329,7 @@
       </section>
 
       <section class="about">
-        <p>収録曲は2曲とも Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。プレーヤーはプレイリスト再生に対応し、リピートは全曲・1曲・なしから選べます（前後の曲への移動ボタン付き）。</p>
+        <p>収録曲は2曲とも Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。プレーヤーはプレイリスト再生に対応し、リピートは全曲・1曲・なしから選べます（前後の曲への移動ボタン付き）。音源はページを開いた時点で全曲を読み込むため、再生中に追加の通信は発生しません。</p>
         <p>1. INTERSECTION AT DAYBREAK（ジャズピアノ）：<a href="https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/jWwyIXZohye4" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
         <p>2. Before the Final Bell（ピアノ協奏曲風）：<a href="https://drive.google.com/file/d/14Y5sQvIoQf9ODP9jiGtD22AqzMclq_oL/view" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/ncgEleilLrru" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
       </section>
@@ -967,6 +967,24 @@
 
         drawTimer();
         applyTrack(0);
+
+        /* Preload every track as soon as the page opens, so playback later
+           in the session never waits and never uses more network. Playback
+           joins the same in-flight loads via loadPromises. */
+        setStatus("音源を読み込んでいます…");
+        Promise.all(TRACKS.map(function (tr, i) {
+          return loadTrackSource(i).catch(function () { return null; });
+        })).then(function (results) {
+          if (state !== "idle") return;
+          var okCount = results.filter(function (r) { return r; }).length;
+          if (okCount === TRACKS.length) {
+            setStatus("読み込み完了。ボタンを押すと再生します");
+          } else if (okCount > 0) {
+            setStatus("一部の音源を読み込めませんでした。再生時に再試行します");
+          } else {
+            setStatus("音源を読み込めませんでした。再生時に再試行します", true);
+          }
+        });
       })();
     </script>
   </body>
