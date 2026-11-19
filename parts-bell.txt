@@ -1,7 +1,0 @@
-bell-part-0
-bell-part-1
-bell-part-2
-bell-part-3
-bell-part-4
-bell-part-5
-bell-part-6
