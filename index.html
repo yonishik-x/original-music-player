@@ -104,6 +104,44 @@
       }
       .chip.loop { color: var(--accent-strong); border-color: var(--accent); font-weight: 700; }
 
+      /* ---------- Playlist ---------- */
+      .playlist { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+      .pl-row {
+        display: flex; align-items: center; gap: 10px;
+        border: 1px solid var(--line); background: var(--surface-2);
+        border-radius: 12px; padding: 8px 10px;
+      }
+      .pl-row.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+      .pl-row.off { opacity: .48; filter: grayscale(.7); }
+      .pl-row.dragging { position: relative; z-index: 3; box-shadow: var(--shadow); background: var(--surface); }
+      .pl-handle {
+        display: flex; align-items: center; gap: 6px;
+        cursor: grab; touch-action: none; color: var(--ink-soft);
+        padding: 6px 2px; user-select: none; -webkit-user-select: none; flex: none;
+      }
+      .pl-handle:active { cursor: grabbing; }
+      .pl-num { font-size: .8rem; font-variant-numeric: tabular-nums; min-width: 1.2em; text-align: right; }
+      .pl-grip { font-size: 1rem; line-height: 1; }
+      .pl-main {
+        flex: 1; text-align: left; background: none; border: 0; color: var(--ink);
+        display: flex; flex-direction: column; gap: 1px; padding: 2px 0; min-height: 0;
+      }
+      .pl-main .ts-name { font-weight: 700; font-size: .92rem; line-height: 1.35; }
+      .pl-main .ts-desc { font-size: .78rem; color: var(--ink-soft); }
+      .pl-row.active .pl-main .ts-name { color: var(--accent-strong); }
+      .pl-toggle {
+        flex: none; width: 46px; height: 26px; min-height: 26px; border-radius: 999px;
+        border: 1px solid var(--line); background: var(--surface); position: relative; padding: 0;
+      }
+      .pl-toggle .tg-dot {
+        position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+        border-radius: 50%; background: var(--ink-soft);
+        transition: left .15s, background .15s;
+      }
+      .pl-toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+      .pl-toggle[aria-pressed="true"] .tg-dot { left: 22px; background: var(--accent-ink); }
+      .playlist-hint { font-size: .78rem; color: var(--ink-soft); margin: -8px 0 14px; }
+
       .progress-row { display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; font-size: .85rem; color: var(--ink-soft); }
       .progress {
         flex: 1; height: 22px; display: flex; align-items: center; cursor: pointer;
@@ -121,6 +159,7 @@
       }
       .play-btn:active { transform: scale(.96); }
       .play-btn svg { width: 28px; height: 28px; fill: currentColor; }
+      .play-btn[disabled] { opacity: .55; cursor: wait; }
       .skip-btn {
         width: 44px; height: 44px; border-radius: 50%;
         border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
@@ -128,7 +167,6 @@
       }
       .skip-btn svg { width: 20px; height: 20px; fill: currentColor; }
       .skip-btn:active { transform: scale(.95); }
-      .play-btn[disabled] { opacity: .55; cursor: wait; }
       .status-text { font-size: .9rem; color: var(--ink-soft); min-height: 1.4em; }
       .status-text.err { color: #b3261e; }
       @media (prefers-color-scheme: dark) { .status-text.err { color: #f28b82; } }
@@ -146,17 +184,6 @@
         border-radius: 10px; padding: 4px 12px; font-size: .88rem; font-variant-numeric: tabular-nums;
       }
       .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
-
-      .track-switch { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-      .track-switch button {
-        flex: 1 1 200px; text-align: left;
-        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
-        border-radius: 12px; padding: 8px 12px;
-        display: flex; flex-direction: column; gap: 1px;
-      }
-      .track-switch button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-      .track-switch .ts-name { font-weight: 700; font-size: .92rem; line-height: 1.35; }
-      .track-switch .ts-desc { font-size: .78rem; opacity: .85; }
 
       /* ---------- Timer ---------- */
       .timer {
@@ -207,6 +234,7 @@
         .controls { grid-template-columns: 1fr; text-align: left; width: 100%; }
         .timer-body { width: 100%; }
         .timer .row .lbl { min-width: 0; }
+        .pl-main { text-align: left; }
       }
     </style>
   </head>
@@ -220,11 +248,8 @@
         </div>
 
         <div class="track-head">
-          <div class="track-switch" id="trackSwitch" role="group" aria-label="曲の切り替え">
-            <button data-track="0" aria-pressed="true"><span class="ts-name">INTERSECTION AT DAYBREAK</span><span class="ts-desc">ジャズピアノ・124 BPM</span></button>
-            <button data-track="1" aria-pressed="false"><span class="ts-name">Before the Final Bell</span><span class="ts-desc">ピアノ協奏曲風</span></button>
-            <button data-track="2" aria-pressed="false"><span class="ts-name">COFFEE AND GOLD</span><span class="ts-desc">ピアノポップ・120 BPM</span></button>
-          </div>
+          <div class="playlist" id="playlist" aria-label="プレイリスト"></div>
+          <p class="playlist-hint">左のつまみをドラッグすると再生順を入れ替えできます。右のスイッチで曲ごとにオン／オフを切り替え、オフの曲はプレイリスト再生から外れます。並び順とオン／オフはこの端末に保存されます。</p>
           <h1 class="track-title" id="trackTitle">INTERSECTION AT DAYBREAK</h1>
           <p class="track-sub" id="trackSub">アップテンポ・ジャズピアノ — 仕事の集中用BGM（歌詞なし）</p>
           <div class="track-meta" id="trackMeta">
@@ -330,10 +355,8 @@
       </section>
 
       <section class="about">
-        <p>収録曲は3曲とも Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。プレーヤーはプレイリスト再生に対応し、リピートは全曲・1曲・なしから選べます（前後の曲への移動ボタン付き）。音源はページを開いた時点で全曲を読み込むため、再生中に追加の通信は発生しません。</p>
-        <p>1. INTERSECTION AT DAYBREAK（ジャズピアノ）：<a href="https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/jWwyIXZohye4" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
-        <p>2. Before the Final Bell（ピアノ協奏曲風）：<a href="https://drive.google.com/file/d/14Y5sQvIoQf9ODP9jiGtD22AqzMclq_oL/view" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/ncgEleilLrru" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
-        <p>3. COFFEE AND GOLD（ピアノポップ）：<a href="https://drive.google.com/file/d/1IqC3SHuxFQeS5UaiqLzywj5rPbTbmwAe/view" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/GNDUMs0rT6Ic" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
+        <p>収録曲はすべて Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリの audio/ フォルダに曲ごとのフォルダで保存され、ページを開いた時点でオンになっている曲を読み込むため、再生中に追加の通信は発生しません。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。プレーヤーはプレイリスト再生に対応し、リピートは全曲・1曲・なしから選べます。</p>
+        <div id="aboutTracks"></div>
       </section>
 
     </main>
@@ -344,40 +367,99 @@
     <script>
       (function () {
         "use strict";
-        /* Each track's MP3 ships inside this repository as base64 text
-           chunks listed in its parts file; fetched from the same origin,
-           decoded to a Blob, and played via an object URL. Object URLs are
-           cached per track so switching back is instant. */
+        /* ============ Track data (single source of truth) ============
+           Each track's MP3 ships inside this repository under audio/<id>/
+           as base64 text chunks listed in that folder's parts.txt. The
+           chunks are fetched from the same origin, decoded to a Blob, and
+           played via an object URL. Object URLs are cached per track.
+           To add a track: add its folder under audio/ and one entry here;
+           the playlist UI and the about list are generated from this. */
         var TRACKS = [
           {
             id: "daybreak",
             title: "INTERSECTION AT DAYBREAK",
             sub: "アップテンポ・ジャズピアノ — 仕事の集中用BGM（歌詞なし）",
+            genre: "ジャズピアノ・124 BPM",
             chips: ["124 BPM", "ジャズピアノ＋ドラム＋ベース", "2:52"],
             len: 172.49,
-            parts: "parts.txt"
+            dir: "audio/daybreak/",
+            drive: "https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk",
+            share: "https://share.gemini.google/jWwyIXZohye4"
           },
           {
             id: "bell",
             title: "Before the Final Bell",
             sub: "ラフマニノフ風ピアノ協奏曲 — 切なくも力強い（歌詞なし）",
+            genre: "ピアノ協奏曲風",
             chips: ["ピアノ協奏曲風", "ピアノ＋弦楽オーケストラ", "2:59"],
             len: 179.20,
-            parts: "parts-bell.txt"
+            dir: "audio/bell/",
+            drive: "https://drive.google.com/file/d/14Y5sQvIoQf9ODP9jiGtD22AqzMclq_oL/view",
+            share: "https://share.gemini.google/ncgEleilLrru"
           },
           {
             id: "coffee",
             title: "COFFEE AND GOLD",
             sub: "ピアノポップ — 朝一番に元気が出る、明るく元気な曲（歌詞なし）",
+            genre: "ピアノポップ・120 BPM",
             chips: ["120 BPM", "ピアノ＋ドラム＋ベース", "2:59"],
             len: 179.91,
-            parts: "parts-coffee.txt"
+            dir: "audio/coffee/",
+            drive: "https://drive.google.com/file/d/1IqC3SHuxFQeS5UaiqLzywj5rPbTbmwAe/view",
+            share: "https://share.gemini.google/GNDUMs0rT6Ic"
           }
         ];
         var curTrack = 0;
         var loadedUrls = {};   // track id -> object URL
         var loadPromises = {}; // track id -> Promise<object URL>
         var TRACK_LEN = TRACKS[0].len; // seconds; updated from metadata when available
+
+        function trackIndexById(id) {
+          for (var i = 0; i < TRACKS.length; i++) if (TRACKS[i].id === id) return i;
+          return -1;
+        }
+
+        /* ============ Playlist state (order + on/off, per device) ============ */
+        var LS_KEY = "omp.playlist.v1";
+        var order = TRACKS.map(function (_, i) { return i; }); // track indices in playlist order
+        var enabledById = {};
+        TRACKS.forEach(function (tr) { enabledById[tr.id] = true; });
+        function saveState() {
+          try {
+            localStorage.setItem(LS_KEY, JSON.stringify({
+              order: order.map(function (i) { return TRACKS[i].id; }),
+              enabled: enabledById
+            }));
+          } catch (e) {}
+        }
+        function loadState() {
+          try {
+            var raw = localStorage.getItem(LS_KEY);
+            if (!raw) return;
+            var s = JSON.parse(raw);
+            if (s && s.enabled) {
+              TRACKS.forEach(function (tr) {
+                if (typeof s.enabled[tr.id] === "boolean") enabledById[tr.id] = s.enabled[tr.id];
+              });
+            }
+            if (s && Array.isArray(s.order)) {
+              var seen = {}, restored = [];
+              s.order.forEach(function (id) {
+                var i = trackIndexById(id);
+                if (i >= 0 && !seen[id]) { seen[id] = true; restored.push(i); }
+              });
+              TRACKS.forEach(function (tr, i) { if (!seen[tr.id]) restored.push(i); });
+              if (restored.length === TRACKS.length) order = restored;
+            }
+          } catch (e) {}
+        }
+        loadState();
+        function isEnabled(idx) { return !!enabledById[TRACKS[idx].id]; }
+        function anyEnabled() { return TRACKS.some(function (_, i) { return isEnabled(i); }); }
+        function firstEnabledInOrder() {
+          for (var k = 0; k < order.length; k++) if (isEnabled(order[k])) return order[k];
+          return -1;
+        }
 
         function $(id) { return document.getElementById(id); }
         function fmt(sec) {
@@ -395,9 +477,9 @@
            Google Drive's download endpoints answer as file downloads
            (Content-Disposition: attachment), so browsers refuse to play
            them through an audio element. The MP3 therefore ships inside
-           this repository as base64 text chunks (see parts.txt); fetched from
-           the same origin, decoded to a Blob, and played via an object
-           URL. Two HTMLAudioElements crossfade by .volume for looping. */
+           this repository as base64 text chunks (see audio/<id>/parts.txt);
+           fetched from the same origin, decoded to a Blob, and played via
+           an object URL. Two HTMLAudioElements crossfade by .volume. */
         var playBtn = $("playBtn"), iconPlay = $("iconPlay"), iconPause = $("iconPause"),
             statusEl = $("status"), disc = $("disc"), fill = $("fill"),
             timeNow = $("timeNow"), loopCountEl = $("loopCount");
@@ -419,7 +501,6 @@
           statusEl.className = "status-text" + (isErr ? " err" : "");
         }
         function setPlayUI() {
-          var playing = state === "playing" || state === "loading";
           iconPlay.style.display = state === "playing" ? "none" : "";
           iconPause.style.display = state === "playing" ? "" : "none";
           playBtn.setAttribute("aria-label", state === "playing" ? "一時停止" : "再生");
@@ -471,20 +552,34 @@
         });
         activeDeck().volume = volume;
 
-        function nextIndex(wrap) {
-          if (curTrack + 1 < TRACKS.length) return curTrack + 1;
-          return wrap ? 0 : null;
+        /* ---------- playlist order / advance logic ---------- */
+        function nextEnabled(pos, wrap) {
+          var n = order.length;
+          for (var k = 1; k < n; k++) {
+            var p = pos + k;
+            if (p >= n) {
+              if (!wrap) return null;
+              p = p % n;
+            }
+            if (isEnabled(order[p])) return order[p];
+          }
+          if (wrap && isEnabled(curTrack)) return curTrack;
+          return null;
         }
         function targetForAdvance() {
-          if (repeatMode === "one") return curTrack;
-          if (repeatMode === "all") return nextIndex(true);
-          return nextIndex(false); // "off": null at the end of the playlist
+          var pos = order.indexOf(curTrack);
+          if (pos < 0) pos = 0;
+          if (repeatMode === "one" && isEnabled(curTrack)) return curTrack;
+          if (repeatMode === "off") return nextEnabled(pos, false);
+          return nextEnabled(pos, true); // "all", or "one" with current track off
         }
         function preloadNext() {
           var t = targetForAdvance();
           if (t === null || t === curTrack) return;
           if (!loadedUrls[TRACKS[t].id]) loadTrackSource(t).catch(function () {});
         }
+
+        /* ---------- crossfade engine ---------- */
         function setDeckTrack(deck, trackIdx) {
           var di = decks.indexOf(deck);
           var url = loadedUrls[TRACKS[trackIdx].id];
@@ -595,7 +690,6 @@
             if (t >= 1) {
               finishCrossfade();
             } else {
-              // equal-power-ish linear crossfade on element volume
               fadeInDeck.volume = Math.min(1, Math.max(0, volume * t));
               fadeOutDeck.volume = Math.min(1, Math.max(0, volume * (1 - t)));
             }
@@ -623,13 +717,13 @@
           var tr = TRACKS[idx];
           if (loadedUrls[tr.id]) return Promise.resolve(loadedUrls[tr.id]);
           if (loadPromises[tr.id]) return loadPromises[tr.id];
-          loadPromises[tr.id] = fetch(tr.parts).then(function (r) {
+          loadPromises[tr.id] = fetch(tr.dir + "parts.txt").then(function (r) {
             if (!r.ok) throw new Error("fetch failed");
             return r.text();
           }).then(function (list) {
             var names = list.split(/\s+/).filter(function (x) { return x; });
             return Promise.all(names.map(function (nm) {
-              return fetch(nm).then(function (r) {
+              return fetch(tr.dir + nm).then(function (r) {
                 if (!r.ok) throw new Error("fetch failed: " + nm);
                 return r.text();
               });
@@ -661,6 +755,7 @@
           return loadPromises[tr.id];
         }
 
+        /* ---------- track display / selection ---------- */
         function renderTrackUI(idx) {
           var tr = TRACKS[idx];
           TRACK_LEN = tr.len;
@@ -679,8 +774,8 @@
           lp.className = "chip loop";
           lp.textContent = "ループ再生対応";
           meta.appendChild(lp);
-          document.querySelectorAll("#trackSwitch button").forEach(function (b, i) {
-            b.setAttribute("aria-pressed", i === idx ? "true" : "false");
+          document.querySelectorAll(".pl-row").forEach(function (row) {
+            row.classList.toggle("active", trackIndexById(row.getAttribute("data-id")) === idx);
           });
         }
         function applyTrack(idx) {
@@ -782,18 +877,36 @@
           unlockChime();
           if (state === "playing") { pausePlayback(); return; }
           if (state === "loading") return;
+          if (!isEnabled(curTrack)) {
+            var first = firstEnabledInOrder();
+            if (first < 0) {
+              setStatus("オンになっている曲がありません。プレイリストで曲をオンにしてください", true);
+              return;
+            }
+            applyTrack(first);
+          }
           if (state === "paused") { beginPlay(null); return; }
           beginPlay(0);
         });
 
-        /* track switching */
-        $("trackSwitch").addEventListener("click", function (ev) {
-          var b = ev.target.closest("button");
-          if (!b) return;
-          var idx = parseInt(b.getAttribute("data-track"), 10);
-          if (idx === curTrack || state === "loading") return;
+        /* prev / next (playlist order, skipping off tracks) */
+        function skipTo(idx) {
+          if (idx === null || idx === undefined || idx < 0) return;
+          var wasPlaying = state === "playing";
           applyTrack(idx);
-        });
+          if (wasPlaying) beginPlay(0);
+        }
+        function stepManual(dir) {
+          var pos = order.indexOf(curTrack);
+          if (pos < 0) pos = 0;
+          var n = order.length;
+          for (var k = 1; k <= n; k++) {
+            var p = ((pos + dir * k) % n + n) % n;
+            if (isEnabled(order[p])) { skipTo(order[p]); return; }
+          }
+        }
+        $("nextBtn").addEventListener("click", function () { stepManual(1); });
+        $("prevBtn").addEventListener("click", function () { stepManual(-1); });
 
         /* seek */
         $("progress").addEventListener("click", function (ev) {
@@ -846,17 +959,142 @@
           preloadNext();
         });
 
-        /* prev / next */
-        function skipTo(idx) {
-          if (idx === null || idx === undefined) return;
-          var wasPlaying = state === "playing";
-          applyTrack(idx);
-          if (wasPlaying) beginPlay(0);
+        /* ---------- playlist UI (rows generated from TRACKS + order) ---------- */
+        var playlistEl = $("playlist");
+        function renumberRows() {
+          var rows = playlistEl.children;
+          for (var i = 0; i < rows.length; i++) {
+            rows[i].querySelector(".pl-num").textContent = String(i + 1);
+          }
         }
-        $("nextBtn").addEventListener("click", function () { skipTo(nextIndex(true)); });
-        $("prevBtn").addEventListener("click", function () {
-          skipTo(curTrack - 1 >= 0 ? curTrack - 1 : TRACKS.length - 1);
-        });
+        function buildPlaylist() {
+          playlistEl.innerHTML = "";
+          order.forEach(function (ti) {
+            var tr = TRACKS[ti];
+            var row = document.createElement("div");
+            row.className = "pl-row" + (enabledById[tr.id] ? "" : " off");
+            row.setAttribute("data-id", tr.id);
+
+            var handle = document.createElement("span");
+            handle.className = "pl-handle";
+            handle.title = "ドラッグで並び替え";
+            var num = document.createElement("span");
+            num.className = "pl-num";
+            var grip = document.createElement("span");
+            grip.className = "pl-grip";
+            grip.textContent = "⠿";
+            grip.setAttribute("aria-hidden", "true");
+            handle.appendChild(num);
+            handle.appendChild(grip);
+
+            var main = document.createElement("button");
+            main.className = "pl-main";
+            main.type = "button";
+            var nm = document.createElement("span");
+            nm.className = "ts-name";
+            nm.textContent = tr.title;
+            var ds = document.createElement("span");
+            ds.className = "ts-desc";
+            ds.textContent = tr.genre;
+            main.appendChild(nm);
+            main.appendChild(ds);
+            main.addEventListener("click", function () {
+              var idx = trackIndexById(tr.id);
+              if (!isEnabled(idx)) {
+                setStatus("この曲はオフになっています。右のスイッチでオンにしてください");
+                return;
+              }
+              if (idx === curTrack || state === "loading") return;
+              skipTo(idx);
+            });
+
+            var toggle = document.createElement("button");
+            toggle.className = "pl-toggle";
+            toggle.type = "button";
+            toggle.setAttribute("aria-pressed", enabledById[tr.id] ? "true" : "false");
+            toggle.setAttribute("aria-label", tr.title + " をプレイリストに含める");
+            var dot = document.createElement("span");
+            dot.className = "tg-dot";
+            toggle.appendChild(dot);
+            toggle.addEventListener("click", function () {
+              var idx = trackIndexById(tr.id);
+              enabledById[tr.id] = !enabledById[tr.id];
+              toggle.setAttribute("aria-pressed", enabledById[tr.id] ? "true" : "false");
+              row.classList.toggle("off", !enabledById[tr.id]);
+              saveState();
+              if (enabledById[tr.id]) {
+                loadTrackSource(idx).catch(function () {});
+              }
+              preloadNext();
+            });
+
+            wireDrag(handle, row);
+            row.appendChild(handle);
+            row.appendChild(main);
+            row.appendChild(toggle);
+            playlistEl.appendChild(row);
+          });
+          renumberRows();
+        }
+
+        /* drag & drop reordering via pointer events (mouse + touch) */
+        function wireDrag(handle, row) {
+          var startY = 0, step = 0;
+          handle.addEventListener("pointerdown", function (e) {
+            startY = e.clientY;
+            step = row.offsetHeight + 8; // row height + gap
+            row.classList.add("dragging");
+            try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+            e.preventDefault();
+          });
+          handle.addEventListener("pointermove", function (e) {
+            if (!row.classList.contains("dragging")) return;
+            var dy = e.clientY - startY;
+            while (dy > step / 2 && row.nextElementSibling) {
+              playlistEl.insertBefore(row.nextElementSibling, row);
+              startY += step; dy -= step;
+              renumberRows();
+            }
+            while (dy < -step / 2 && row.previousElementSibling) {
+              playlistEl.insertBefore(row, row.previousElementSibling);
+              startY -= step; dy += step;
+              renumberRows();
+            }
+            row.style.transform = "translateY(" + dy + "px)";
+          });
+          function endDrag() {
+            if (!row.classList.contains("dragging")) return;
+            row.classList.remove("dragging");
+            row.style.transform = "";
+            var ids = [];
+            for (var i = 0; i < playlistEl.children.length; i++) {
+              ids.push(playlistEl.children[i].getAttribute("data-id"));
+            }
+            order = ids.map(function (id) { return trackIndexById(id); });
+            renumberRows();
+            saveState();
+            preloadNext();
+          }
+          handle.addEventListener("pointerup", endDrag);
+          handle.addEventListener("pointercancel", endDrag);
+        }
+
+        /* about list, generated from TRACKS */
+        (function buildAbout() {
+          var box = $("aboutTracks");
+          TRACKS.forEach(function (tr, i) {
+            var p = document.createElement("p");
+            p.appendChild(document.createTextNode((i + 1) + ". " + tr.title + "（" + tr.genre + "）："));
+            var a1 = document.createElement("a");
+            a1.href = tr.drive; a1.target = "_blank"; a1.rel = "noopener"; a1.textContent = "Google Drive";
+            var a2 = document.createElement("a");
+            a2.href = tr.share; a2.target = "_blank"; a2.rel = "noopener"; a2.textContent = "Gemini 共有リンク";
+            p.appendChild(a1);
+            p.appendChild(document.createTextNode("／"));
+            p.appendChild(a2);
+            box.appendChild(p);
+          });
+        })();
 
         /* chime context (timer signal only; unrelated to the track) */
         var chimeCtx = null;
@@ -919,7 +1157,6 @@
         function timerTick() {
           timer.remainMs = Math.max(0, timer.endAt - Date.now());
           if (timer.phase === "focus") {
-            // accumulate completed focus time as the clock runs down
             var elapsedInPhase = timer.phaseStartRemain - timer.remainMs;
             timer.focusDoneMs = timer.focusBase + elapsedInPhase;
           }
@@ -975,26 +1212,31 @@
           drawTimer();
         });
 
+        /* ================= init ================= */
+        buildPlaylist();
         drawTimer();
-        applyTrack(0);
+        applyTrack(firstEnabledInOrder() >= 0 ? firstEnabledInOrder() : 0);
 
-        /* Preload every track as soon as the page opens, so playback later
-           in the session never waits and never uses more network. Playback
-           joins the same in-flight loads via loadPromises. */
-        setStatus("音源を読み込んでいます…");
-        Promise.all(TRACKS.map(function (tr, i) {
-          return loadTrackSource(i).catch(function () { return null; });
-        })).then(function (results) {
-          if (state !== "idle") return;
-          var okCount = results.filter(function (r) { return r; }).length;
-          if (okCount === TRACKS.length) {
-            setStatus("読み込み完了。ボタンを押すと再生します");
-          } else if (okCount > 0) {
-            setStatus("一部の音源を読み込めませんでした。再生時に再試行します");
-          } else {
-            setStatus("音源を読み込めませんでした。再生時に再試行します", true);
-          }
-        });
+        /* Preload every enabled track as soon as the page opens, so
+           playback later in the session never waits and never uses more
+           network. Playback joins the same in-flight loads. */
+        var enabledIdx = TRACKS.map(function (_, i) { return i; }).filter(isEnabled);
+        if (enabledIdx.length > 0) {
+          setStatus("音源を読み込んでいます…");
+          Promise.all(enabledIdx.map(function (i) {
+            return loadTrackSource(i).catch(function () { return null; });
+          })).then(function (results) {
+            if (state !== "idle") return;
+            var okCount = results.filter(function (r) { return r; }).length;
+            if (okCount === enabledIdx.length) {
+              setStatus("読み込み完了。ボタンを押すと再生します");
+            } else if (okCount > 0) {
+              setStatus("一部の音源を読み込めませんでした。再生時に再試行します");
+            } else {
+              setStatus("音源を読み込めませんでした。再生時に再試行します", true);
+            }
+          });
+        }
       })();
     </script>
   </body>
