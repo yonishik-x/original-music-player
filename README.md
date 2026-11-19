@@ -2,6 +2,8 @@
 
 仕事の集中用BGMプレーヤー。単一ファイル（`index.html`）で動作するWebアプリです。
 
+公開ページ: https://yonishik-x.github.io/original-music-player/
+
 ## 収録曲
 
 - **INTERSECTION AT DAYBREAK** — アップテンポなジャズピアノのインストゥルメンタル（124 BPM、2分52秒）
@@ -9,13 +11,11 @@
 
 ## 音源について
 
-音源ファイルはアプリに内蔵せず、Google Driveから直接ストリーミング再生します。
+音源はこのリポジトリ内の `track-part-0`〜`track-part-6`（MP3をBase64テキスト化して分割したもの、`parts.txt` が一覧）として保存され、ページ読み込み時にブラウザがMP3へ復元して再生します。
 
-- 保存先: Google Drive のフォルダ「Focus BGM」内の `Intersection_At_Daybreak.mp3`
-- 共有設定: リンクを知っている人が閲覧のみ可
-- 再生URL: `https://drive.google.com/uc?export=download&id=1VvekNctFUcscDtusIGKYztYJ-IAWOtye`
+当初は Google Drive の直接リンクからストリーミング再生する方式でしたが、Driveのダウンロード用URLはブラウザが「ファイルのダウンロード」として扱う応答（Content-Disposition: attachment）を返すため、音声プレーヤーで再生できず、この方式に変更しました。
 
-Drive側のファイルを差し替えると、アプリ側の変更なしに音源を更新できます。
+元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています（`Intersection_At_Daybreak.mp3`、リンクを知っている人が閲覧のみ可）。
 
 ## 機能
 
@@ -25,4 +25,4 @@ Drive側のファイルを差し替えると、アプリ側の変更なしに音
 
 ## 使い方
 
-`index.html` をブラウザで開くだけで再生できます。静的ホスティング（GitHub Pages、Vercel等）に置いても動作します。
+`index.html` をブラウザで開くか、静的ホスティング（GitHub Pages、Vercel等）に置いて使います。`track-part-*` と `parts.txt` は `index.html` と同じ場所に置いてください。

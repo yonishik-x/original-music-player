@@ -225,7 +225,7 @@
               <svg id="iconPlay" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
               <svg id="iconPause" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z"/></svg>
             </button>
-            <span class="status-text" id="status">ボタンを押すと Google Drive から読み込んで再生します</span>
+            <span class="status-text" id="status">ボタンを押すと音源を読み込んで再生します</span>
           </div>
 
           <div class="controls">
@@ -294,20 +294,21 @@
       </section>
 
       <section class="about">
-        <p>この曲は Gemini（Lyria）で生成した「Focus Jazz Piano Loop」のアップテンポ版です。音源は Google Drive のフォルダ「Focus BGM」に置かれ、このアプリは Drive から直接ストリーミング再生します（リンク共有：閲覧のみ）。Drive 側でファイルを差し替えると、アプリを作り直さなくても再生内容が変わります。</p>
-        <p>音源ファイル：<a href="https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk" target="_blank" rel="noopener">Intersection_At_Daybreak.mp3（Google Drive）</a></p>
+        <p>この曲は Gemini（Lyria）で生成した「Focus Jazz Piano Loop」のアップテンポ版です。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。</p>
+        <p>音源ファイル（保管先）：<a href="https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk" target="_blank" rel="noopener">Intersection_At_Daybreak.mp3（Google Drive）</a></p>
         <p>元の生成ページ：<a href="https://share.gemini.google/jWwyIXZohye4" target="_blank" rel="noopener">Gemini 共有リンク</a>／<a href="https://gemini.google.com/app/abda3159b7e4e4e0" target="_blank" rel="noopener">作業用ジャズピアノの楽曲制作</a></p>
       </section>
 
     </main>
 
-    <audio id="audioA" src="https://drive.google.com/uc?export=download&id=1VvekNctFUcscDtusIGKYztYJ-IAWOtye" preload="auto"></audio>
-    <audio id="audioB" src="https://drive.google.com/uc?export=download&id=1VvekNctFUcscDtusIGKYztYJ-IAWOtye" preload="none"></audio>
+    <audio id="audioA" preload="none"></audio>
+    <audio id="audioB" preload="none"></audio>
 
     <script>
       (function () {
         "use strict";
-        var TRACK_URL = "https://drive.google.com/uc?export=download&id=1VvekNctFUcscDtusIGKYztYJ-IAWOtye";
+        var TRACK_PARTS_URL = "parts.txt"; // lists base64 text chunks of the MP3 stored in-repo; decoded to a blob URL at runtime
+        var trackSrcPromise = null, trackObjUrl = null;
         var TRACK_LEN = 172.49; // seconds; updated from metadata when Drive responds
 
         function $(id) { return document.getElementById(id); }
@@ -322,10 +323,13 @@
           return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
         }
 
-        /* ============ Player (Drive streaming, dual-deck crossfade) ============
-           Google Drive's download URL may not return CORS headers, so the
-           track is never fetched/decoded via Web Audio. Two HTMLAudioElements
-           stream it directly and their .volume values are crossfaded. */
+        /* ============ Player (in-repo audio, dual-deck crossfade) ============
+           Google Drive's download endpoints answer as file downloads
+           (Content-Disposition: attachment), so browsers refuse to play
+           them through an audio element. The MP3 therefore ships inside
+           this repository as base64 text chunks (see parts.txt); fetched from
+           the same origin, decoded to a Blob, and played via an object
+           URL. Two HTMLAudioElements crossfade by .volume for looping. */
         var playBtn = $("playBtn"), iconPlay = $("iconPlay"), iconPause = $("iconPause"),
             statusEl = $("status"), disc = $("disc"), fill = $("fill"),
             timeNow = $("timeNow"), loopCountEl = $("loopCount");
@@ -376,7 +380,7 @@
               stopProgress();
               setPlayUI();
               playBtn.disabled = false;
-              setStatus("Drive から音源を読み込めませんでした。通信状態を確認して、もう一度お試しください", true);
+              setStatus("音源を読み込めませんでした。通信状態を確認して、もう一度お試しください", true);
             }
           });
           d.addEventListener("ended", function () {
@@ -468,17 +472,70 @@
         function startProgress() { stopProgress(); rafId = requestAnimationFrame(progressLoop); }
         function stopProgress() { if (rafId) cancelAnimationFrame(rafId); rafId = null; }
 
+        function loadTrackSource() {
+          if (trackObjUrl) return Promise.resolve(trackObjUrl);
+          if (trackSrcPromise) return trackSrcPromise;
+          trackSrcPromise = fetch(TRACK_PARTS_URL).then(function (r) {
+            if (!r.ok) throw new Error("fetch failed");
+            return r.text();
+          }).then(function (list) {
+            var names = list.split(/\s+/).filter(function (x) { return x; });
+            return Promise.all(names.map(function (nm) {
+              return fetch(nm).then(function (r) {
+                if (!r.ok) throw new Error("fetch failed: " + nm);
+                return r.text();
+              });
+            })).then(function (chunks) { return chunks.join(""); });
+          }).then(function (b64) {
+            var clean = b64.replace(/\s+/g, "");
+            var bytes = new Uint8Array(clean.length * 3 / 4 + 3);
+            var n = 0, i, j, buf;
+            for (i = 0; i < clean.length; i += 4) {
+              buf = 0;
+              var cnt = 0;
+              for (j = 0; j < 4 && i + j < clean.length; j++) {
+                var c = clean.charAt(i + j);
+                if (c === "=") break;
+                var v = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".indexOf(c);
+                if (v < 0) continue;
+                buf = (buf << 6) | v;
+                cnt++;
+              }
+              buf <<= (4 - cnt) * 6;
+              if (cnt >= 2) bytes[n++] = (buf >> 16) & 255;
+              if (cnt >= 3) bytes[n++] = (buf >> 8) & 255;
+              if (cnt >= 4) bytes[n++] = buf & 255;
+            }
+            var blob = new Blob([bytes.subarray(0, n)], { type: "audio/mpeg" });
+            trackObjUrl = URL.createObjectURL(blob);
+            decks.forEach(function (d) { d.src = trackObjUrl; });
+            return trackObjUrl;
+          }).catch(function (e) { trackSrcPromise = null; throw e; });
+          return trackSrcPromise;
+        }
+
         function beginPlay(fromPos) {
           var d = activeDeck();
           d.playbackRate = rate;
           d.volume = volume;
           if (typeof fromPos === "number") { try { d.currentTime = fromPos; } catch (e) {} }
           // warm up the idle deck so the first crossfade can start on time
-          try { idleDeck().load(); } catch (e) {}
+          if (trackObjUrl) { try { idleDeck().load(); } catch (e) {} }
           state = "loading";
           playBtn.disabled = true;
           setPlayUI();
-          setStatus("Drive から読み込み中…");
+          setStatus("読み込み中…");
+          if (!trackObjUrl) {
+            loadTrackSource().then(function () {
+              if (state === "loading") beginPlay(fromPos);
+            }).catch(function () {
+              playBtn.disabled = false;
+              state = "idle";
+              setPlayUI();
+              setStatus("音源を読み込めませんでした。もう一度お試しください", true);
+            });
+            return;
+          }
           var p = d.play();
           var done = function () {
             playBtn.disabled = false;
@@ -486,7 +543,7 @@
               state = "playing";
               startProgress();
               setPlayUI();
-              setStatus("再生中 — Drive からストリーミング再生（ループ）");
+              setStatus("再生中（ループ）");
             }
           };
           if (p && p.then) {
