@@ -19,7 +19,6 @@ README.md           このファイル
 ## 収録曲
 
 - **INTERSECTION AT DAYBREAK**（`audio/daybreak/`）— アップテンポなジャズピアノ（124 BPM、2分52秒）
-- **Before the Final Bell**（`audio/bell/`）— ラフマニノフ風ピアノ協奏曲（2分59秒）
 - **COFFEE AND GOLD**（`audio/coffee/`）— ピアノポップ（120 BPM、2分59秒）
 - **STEPS IN THE SUN**（`audio/sun/`）— ジャズピアノポップ（116 BPM、3分0秒）
 
