@@ -12,6 +12,7 @@ audio/<曲ID>/       曲ごとの音源データ
   parts.txt         分割ファイルの一覧
   part-0, part-1…   MP3をBase64テキスト化して約900KBずつ分割したもの
 tracks/             曲ごとの生成プロンプト記録（1曲1ファイル＋一覧 README.md）
+generation-policy.md  BGM生成方針（ベースプロンプトと日替わりバリエーションのルール）
 README.md           このファイル
 ```
 
