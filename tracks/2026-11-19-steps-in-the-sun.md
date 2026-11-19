@@ -26,4 +26,4 @@
 - Gemini会話ページ: https://gemini.google.com/app/e18450ab03d2ed90
 - Muse側の保存ファイル名: `2026-11-19-Steps_in_the_Sun.mp3`（focus-jazz-piano フォルダ）
 
-注: プレーヤーへの追加はユーザーの指示があってから行う（現時点では未追加）。
+注: 2026-11-19にユーザーの指示でプレーヤーへ4曲目として追加済み（audio/sun/ に音源データを配置）。

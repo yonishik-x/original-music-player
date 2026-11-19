@@ -21,6 +21,7 @@ README.md           このファイル
 - **INTERSECTION AT DAYBREAK**（`audio/daybreak/`）— アップテンポなジャズピアノ（124 BPM、2分52秒）
 - **Before the Final Bell**（`audio/bell/`）— ラフマニノフ風ピアノ協奏曲（2分59秒）
 - **COFFEE AND GOLD**（`audio/coffee/`）— ピアノポップ（120 BPM、2分59秒）
+- **STEPS IN THE SUN**（`audio/sun/`）— ジャズピアノポップ（116 BPM、3分0秒）
 
 いずれも Gemini（Lyria）で生成したインストゥルメンタル。各曲のプロンプトと音源リンクは `tracks/` に記録。
 
