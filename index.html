@@ -697,7 +697,7 @@
           else activeDeck().removeAttribute("src");
           drawProgress(0);
           setPlayUI();
-          setStatus("ボタンを押すと音源を読み込んで再生します");
+          setStatus(url ? "読み込み完了。ボタンを押すと再生します" : "ボタンを押すと音源を読み込んで再生します");
           preloadNext();
         }
 
