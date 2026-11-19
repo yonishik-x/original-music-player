@@ -19,4 +19,4 @@
 - Gemini会話ページ: https://gemini.google.com/app/10eb801cc782eebd
 - Muse側の保存ファイル名: `2026-11-19-Before_the_Final_Bell.mp3`（focus-jazz-piano フォルダ）
 
-注: この曲はまだプレーヤー（index.html）の再生対象には入っていない。プレーヤーへ追加する場合は別途差し替え作業を行う。
+注: 2026-11-19にプレーヤーへ2曲目として追加済み（切り替え式）。GitHub Pages版・アプリ版の両方で再生できることを実ブラウザで確認済み。
