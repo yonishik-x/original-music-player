@@ -121,6 +121,13 @@
       }
       .play-btn:active { transform: scale(.96); }
       .play-btn svg { width: 28px; height: 28px; fill: currentColor; }
+      .skip-btn {
+        width: 44px; height: 44px; border-radius: 50%;
+        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+        display: grid; place-items: center;
+      }
+      .skip-btn svg { width: 20px; height: 20px; fill: currentColor; }
+      .skip-btn:active { transform: scale(.95); }
       .play-btn[disabled] { opacity: .55; cursor: wait; }
       .status-text { font-size: .9rem; color: var(--ink-soft); min-height: 1.4em; }
       .status-text.err { color: #b3261e; }
@@ -128,7 +135,7 @@
 
       .controls {
         margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line);
-        display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
       }
       .ctl label { display: block; font-size: .8rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 6px; letter-spacing: .03em; }
       .ctl .val { color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -235,9 +242,15 @@
           </div>
 
           <div class="transport">
+            <button class="skip-btn" id="prevBtn" aria-label="前の曲">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2.2v14H6zM20 5.5v13L9.8 12z"/></svg>
+            </button>
             <button class="play-btn" id="playBtn" aria-label="再生">
               <svg id="iconPlay" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
               <svg id="iconPause" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z"/></svg>
+            </button>
+            <button class="skip-btn" id="nextBtn" aria-label="次の曲">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.8 5H18v14h-2.2zM4 5.5v13L14.2 12z"/></svg>
             </button>
             <span class="status-text" id="status">ボタンを押すと音源を読み込んで再生します</span>
           </div>
@@ -263,6 +276,14 @@
                 <button data-xf="2" aria-pressed="false">2秒</button>
                 <button data-xf="4" aria-pressed="true">4秒</button>
                 <button data-xf="6" aria-pressed="false">6秒</button>
+              </div>
+            </div>
+            <div class="ctl">
+              <label>リピート</label>
+              <div class="seg" id="repeatSeg" role="group" aria-label="リピート設定">
+                <button data-repeat="all" aria-pressed="true">全曲</button>
+                <button data-repeat="one" aria-pressed="false">1曲</button>
+                <button data-repeat="off" aria-pressed="false">なし</button>
               </div>
             </div>
           </div>
@@ -308,7 +329,7 @@
       </section>
 
       <section class="about">
-        <p>収録曲は2曲とも Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。</p>
+        <p>収録曲は2曲とも Gemini（Lyria）で生成したインストゥルメンタルです。音源はこのリポジトリ内に保存され、ページと同じ場所から読み込んで再生します。元のMP3は Google Drive のフォルダ「Focus BGM」にも保管されています。各曲の生成プロンプトは、このリポジトリの tracks/ フォルダに音源リンクとセットで保存されています。プレーヤーはプレイリスト再生に対応し、リピートは全曲・1曲・なしから選べます（前後の曲への移動ボタン付き）。</p>
         <p>1. INTERSECTION AT DAYBREAK（ジャズピアノ）：<a href="https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/jWwyIXZohye4" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
         <p>2. Before the Final Bell（ピアノ協奏曲風）：<a href="https://drive.google.com/file/d/14Y5sQvIoQf9ODP9jiGtD22AqzMclq_oL/view" target="_blank" rel="noopener">Google Drive</a>／<a href="https://share.gemini.google/ncgEleilLrru" target="_blank" rel="noopener">Gemini 共有リンク</a></p>
       </section>
@@ -373,6 +394,9 @@
 
         var decks = [$("audioA"), $("audioB")];
         var activeIdx = 0;
+        var deckTrack = [-1, -1]; // which TRACKS index each deck holds
+        var deckDur = [0, 0];     // measured duration per deck
+        var repeatMode = "all";   // all | one | off
         var state = "idle"; // idle | loading | playing | paused
         var rate = 1.0, volume = 0.8, xf = 4;
         var loopCount = 0;
@@ -398,16 +422,23 @@
           return activeDeck().currentTime || pausedPos || 0;
         }
         function deckDuration(d) {
-          return (d && isFinite(d.duration) && d.duration > 0) ? d.duration : TRACK_LEN;
+          var di = decks.indexOf(d);
+          if (di >= 0 && deckDur[di] > 0) return deckDur[di];
+          if (d && isFinite(d.duration) && d.duration > 0) return d.duration;
+          var ti = di >= 0 ? deckTrack[di] : -1;
+          return ti >= 0 ? TRACKS[ti].len : TRACK_LEN;
         }
 
-        decks.forEach(function (d) {
+        decks.forEach(function (d, di) {
           d.volume = 0;
           d.playbackRate = rate;
           d.addEventListener("loadedmetadata", function () {
-            if (d.src && d.src === loadedUrls[TRACKS[curTrack].id] && isFinite(d.duration) && d.duration > 0) {
-              TRACK_LEN = d.duration;
-              $("timeTotal").textContent = fmt(TRACK_LEN);
+            if (isFinite(d.duration) && d.duration > 0) {
+              deckDur[di] = d.duration;
+              if (di === activeIdx && deckTrack[di] === curTrack) {
+                TRACK_LEN = d.duration;
+                $("timeTotal").textContent = fmt(TRACK_LEN);
+              }
             }
           });
           d.addEventListener("error", function () {
@@ -422,14 +453,51 @@
           });
           d.addEventListener("ended", function () {
             // Safety net if the progress loop missed the end (throttled tab, xf = 0)
-            if (state === "playing" && !fading && d === activeDeck()) swapDeck(0);
+            if (state === "playing" && !fading && d === activeDeck()) {
+              if (targetForAdvance() === null) finishPlaylist();
+              else advanceNow();
+            }
           });
         });
         activeDeck().volume = volume;
 
+        function nextIndex(wrap) {
+          if (curTrack + 1 < TRACKS.length) return curTrack + 1;
+          return wrap ? 0 : null;
+        }
+        function targetForAdvance() {
+          if (repeatMode === "one") return curTrack;
+          if (repeatMode === "all") return nextIndex(true);
+          return nextIndex(false); // "off": null at the end of the playlist
+        }
+        function preloadNext() {
+          var t = targetForAdvance();
+          if (t === null || t === curTrack) return;
+          if (!loadedUrls[TRACKS[t].id]) loadTrackSource(t).catch(function () {});
+        }
+        function setDeckTrack(deck, trackIdx) {
+          var di = decks.indexOf(deck);
+          var url = loadedUrls[TRACKS[trackIdx].id];
+          deckTrack[di] = trackIdx;
+          deckDur[di] = 0;
+          if (deck.src !== url) deck.src = url;
+          try { deck.currentTime = 0; } catch (e) {}
+        }
         function startCrossfade() {
+          var target = targetForAdvance();
+          if (target === null) return;
+          if (!loadedUrls[TRACKS[target].id]) {
+            // next track not decoded yet: fetch it; the progress loop retries
+            loadTrackSource(target).catch(function () {});
+            return;
+          }
           var out = activeDeck(), inn = idleDeck();
-          try { inn.currentTime = 0; } catch (e) {}
+          if (deckTrack[decks.indexOf(inn)] !== target) {
+            setDeckTrack(inn, target);
+          } else {
+            if (inn.src !== loadedUrls[TRACKS[target].id]) inn.src = loadedUrls[TRACKS[target].id];
+            try { inn.currentTime = 0; } catch (e) {}
+          }
           inn.playbackRate = rate;
           inn.volume = 0;
           var p = inn.play();
@@ -438,8 +506,18 @@
           fadeOutDeck = out; fadeInDeck = inn;
           fadeStart = performance.now();
           fadeDurMs = Math.max(60, xf * 1000);
+          TRACK_LEN = TRACKS[target].len;
           loopCount++;
           loopCountEl.textContent = loopCount;
+        }
+        function settleActiveDeck() {
+          var ti = deckTrack[activeIdx];
+          if (ti >= 0 && ti !== curTrack) {
+            curTrack = ti;
+            renderTrackUI(ti);
+          }
+          TRACK_LEN = deckDuration(activeDeck());
+          preloadNext();
         }
         function finishCrossfade() {
           if (!fading) return;
@@ -448,6 +526,7 @@
           fadeOutDeck.volume = 0;
           activeIdx = decks.indexOf(fadeInDeck);
           fading = false; fadeOutDeck = null; fadeInDeck = null;
+          settleActiveDeck();
         }
         function cancelCrossfade(keepIn) {
           if (!fading) return;
@@ -458,11 +537,19 @@
           keep.volume = volume;
           activeIdx = decks.indexOf(keep);
           fading = false; fadeOutDeck = null; fadeInDeck = null;
+          settleActiveDeck();
         }
-        function swapDeck(fadeSec) {
-          if (fadeSec > 0) { startCrossfade(); return; }
+        function advanceNow() {
+          var target = targetForAdvance();
+          if (target === null) { finishPlaylist(); return; }
+          if (!loadedUrls[TRACKS[target].id]) {
+            loadTrackSource(target).then(function () {
+              if (state === "playing" && !fading) advanceNow();
+            }).catch(function () {});
+            return;
+          }
           var out = activeDeck(), inn = idleDeck();
-          try { inn.currentTime = 0; } catch (e) {}
+          setDeckTrack(inn, target);
           inn.playbackRate = rate;
           inn.volume = volume;
           var p = inn.play();
@@ -472,6 +559,16 @@
           activeIdx = 1 - activeIdx;
           loopCount++;
           loopCountEl.textContent = loopCount;
+          settleActiveDeck();
+        }
+        function finishPlaylist() {
+          decks.forEach(function (d) { try { d.pause(); } catch (e) {} });
+          state = "idle";
+          fading = false; fadeOutDeck = null; fadeInDeck = null;
+          stopProgress();
+          drawProgress(TRACK_LEN);
+          setPlayUI();
+          setStatus("プレイリストの最後まで再生しました");
         }
 
         /* progress + crossfade driver */
@@ -497,8 +594,11 @@
             var d = activeDeck();
             var dur = deckDuration(d);
             var remainWall = (dur - (d.currentTime || 0)) / rate;
-            if (remainWall <= 0.08) {
-              swapDeck(0);
+            var target = targetForAdvance();
+            if (target === null) {
+              if (remainWall <= 0.08) finishPlaylist();
+            } else if (remainWall <= 0.08) {
+              advanceNow();
             } else if (xf > 0 && remainWall <= xf) {
               startCrossfade();
             }
@@ -551,16 +651,7 @@
           return loadPromises[tr.id];
         }
 
-        function applyTrack(idx) {
-          curTrack = idx;
-          fading = false; fadeOutDeck = null; fadeInDeck = null;
-          decks.forEach(function (d) { try { d.pause(); } catch (e) {} d.volume = 0; });
-          activeDeck().volume = volume;
-          state = "idle";
-          pausedPos = 0;
-          loopCount = 0;
-          loopCountEl.textContent = "0";
-          stopProgress();
+        function renderTrackUI(idx) {
           var tr = TRACKS[idx];
           TRACK_LEN = tr.len;
           $("trackTitle").textContent = tr.title;
@@ -578,17 +669,36 @@
           lp.className = "chip loop";
           lp.textContent = "ループ再生対応";
           meta.appendChild(lp);
-          var url = loadedUrls[tr.id];
-          decks.forEach(function (d) {
-            if (url) { d.src = url; }
-            else { d.removeAttribute("src"); try { d.load(); } catch (e) {} }
-          });
           document.querySelectorAll("#trackSwitch button").forEach(function (b, i) {
             b.setAttribute("aria-pressed", i === idx ? "true" : "false");
           });
+        }
+        function applyTrack(idx) {
+          curTrack = idx;
+          fading = false; fadeOutDeck = null; fadeInDeck = null;
+          decks.forEach(function (d, di) {
+            try { d.pause(); } catch (e) {}
+            d.volume = 0;
+            deckTrack[di] = -1;
+            deckDur[di] = 0;
+            if (di !== activeIdx) { d.removeAttribute("src"); try { d.load(); } catch (e) {} }
+          });
+          activeDeck().volume = volume;
+          state = "idle";
+          playBtn.disabled = false;
+          pausedPos = 0;
+          loopCount = 0;
+          loopCountEl.textContent = "0";
+          stopProgress();
+          renderTrackUI(idx);
+          deckTrack[activeIdx] = idx;
+          var url = loadedUrls[TRACKS[idx].id];
+          if (url) activeDeck().src = url;
+          else activeDeck().removeAttribute("src");
           drawProgress(0);
           setPlayUI();
           setStatus("ボタンを押すと音源を読み込んで再生します");
+          preloadNext();
         }
 
         function beginPlay(fromPos) {
@@ -600,7 +710,8 @@
             setStatus("読み込み中…");
             loadTrackSource(curTrack).then(function (u) {
               if (state !== "loading") return;
-              decks.forEach(function (d) { d.src = u; });
+              deckTrack[activeIdx] = curTrack;
+              activeDeck().src = u;
               state = "idle";
               beginPlay(fromPos);
             }).catch(function () {
@@ -611,7 +722,8 @@
             });
             return;
           }
-          decks.forEach(function (d) { if (d.src !== url) d.src = url; });
+          deckTrack[activeIdx] = curTrack;
+          if (activeDeck().src !== url) activeDeck().src = url;
           var d = activeDeck();
           d.playbackRate = rate;
           d.volume = volume;
@@ -629,7 +741,8 @@
               state = "playing";
               startProgress();
               setPlayUI();
-              setStatus("再生中（ループ）");
+              setStatus(repeatMode === "one" ? "再生中（1曲リピート）" : "再生中（プレイリスト）");
+              preloadNext();
             }
           };
           if (p && p.then) {
@@ -711,6 +824,28 @@
         segWire("xfSeg", "data-xf", function (v) {
           xf = v;
           if (fading && v === 0) finishCrossfade();
+        });
+
+        /* repeat mode (string values, so not segWire) */
+        var repeatSeg = $("repeatSeg");
+        repeatSeg.addEventListener("click", function (ev) {
+          var b = ev.target.closest("button");
+          if (!b) return;
+          repeatSeg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+          repeatMode = b.getAttribute("data-repeat");
+          preloadNext();
+        });
+
+        /* prev / next */
+        function skipTo(idx) {
+          if (idx === null || idx === undefined) return;
+          var wasPlaying = state === "playing";
+          applyTrack(idx);
+          if (wasPlaying) beginPlay(0);
+        }
+        $("nextBtn").addEventListener("click", function () { skipTo(nextIndex(true)); });
+        $("prevBtn").addEventListener("click", function () {
+          skipTo(curTrack - 1 >= 0 ? curTrack - 1 : TRACKS.length - 1);
         });
 
         /* chime context (timer signal only; unrelated to the track) */
