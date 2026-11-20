@@ -554,8 +554,23 @@
             }
           });
           d.addEventListener("ended", function () {
-            // Safety net if the progress loop missed the end (throttled tab, xf = 0)
-            if (state === "playing" && !fading && d === activeDeck()) {
+            // Safety net if the progress loop missed the end (throttled tab, xf = 0).
+            // Also resolves a crossfade whose driver (requestAnimationFrame)
+            // froze while the page was hidden: without this, both decks could
+            // stay audible at once after a backgrounded fade.
+            if (state !== "playing") return;
+            if (fading) {
+              if (d === fadeOutDeck || d === fadeInDeck) {
+                finishCrossfade();
+                var a = activeDeck();
+                if (a.ended || (isFinite(a.duration) && a.duration > 0 && a.currentTime >= a.duration - 0.05)) {
+                  if (targetForAdvance() === null) finishPlaylist();
+                  else advanceNow();
+                }
+              }
+              return;
+            }
+            if (d === activeDeck()) {
               if (targetForAdvance() === null) finishPlaylist();
               else advanceNow();
             }
@@ -723,6 +738,45 @@
         }
         function startProgress() { stopProgress(); rafId = requestAnimationFrame(progressLoop); }
         function stopProgress() { if (rafId) cancelAnimationFrame(rafId); rafId = null; }
+
+        /* ---------- background safety ----------
+           requestAnimationFrame stops while the page is hidden (app in the
+           background, screen locked), but the audio elements keep playing.
+           A crossfade left unfinished in that state leaves both decks
+           audible at once. So: never stay mid-fade while hidden, reconcile
+           on return, and run a slow watchdog that heals any stuck state. */
+        function reconcilePlayback() {
+          if (state !== "playing") return;
+          if (fading) { finishCrossfade(); return; }
+          var a = activeDeck();
+          if (a.ended || (isFinite(a.duration) && a.duration > 0 && a.currentTime >= a.duration - 0.05)) {
+            if (targetForAdvance() === null) finishPlaylist();
+            else advanceNow();
+          }
+        }
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) {
+            if (fading) finishCrossfade();
+          } else {
+            reconcilePlayback();
+            if (state === "playing") startProgress();
+          }
+        });
+        window.addEventListener("pagehide", function () {
+          if (fading) finishCrossfade();
+        });
+        setInterval(function () {
+          if (state !== "playing") return;
+          if (fading) {
+            if (performance.now() - fadeStart > fadeDurMs + 1500) finishCrossfade();
+          } else {
+            var a = activeDeck();
+            if (a.ended) {
+              if (targetForAdvance() === null) finishPlaylist();
+              else advanceNow();
+            }
+          }
+        }, 1000);
 
         function loadTrackSource(idx) {
           var tr = TRACKS[idx];
