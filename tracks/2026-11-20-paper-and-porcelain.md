@@ -26,4 +26,4 @@
 - Gemini会話ページ: https://gemini.google.com/app/c8e381538987dba6
 - Muse側の保存ファイル名: `2026-11-20-Paper_and_Porcelain.mp3`（focus-jazz-piano フォルダ、一時コピー）
 
-注: 曲名はGeminiが付けたもの（カバーアートに表示）。生成は初回で成功し、再試行は不要だった。
+注: 曲名はGeminiが付けたもの（カバーアートに表示）。生成は初回で成功し、再試行は不要だった。2026-11-20にユーザーの指示でプレーヤーへ追加した（audio/porcelain/）。
