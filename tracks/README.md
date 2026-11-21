@@ -14,3 +14,4 @@
 | 2026-11-20 | PAPER AND PORCELAIN | [2026-11-20-paper-and-porcelain.md](2026-11-20-paper-and-porcelain.md) |
 | 2026-11-20 | LOW TIDE AT TWILIGHT | [2026-11-20-low-tide-at-twilight.md](2026-11-20-low-tide-at-twilight.md) |
 | 2026-11-21 | LIGHT THROUGH THE PINE | [2026-11-21-light-through-the-pine.md](2026-11-21-light-through-the-pine.md) |
+| 2026-11-21 | Seven Floors Up | [2026-11-21-seven-floors-up.md](2026-11-21-seven-floors-up.md) |
