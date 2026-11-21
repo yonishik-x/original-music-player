@@ -15,3 +15,4 @@
 | 2026-11-20 | LOW TIDE AT TWILIGHT | [2026-11-20-low-tide-at-twilight.md](2026-11-20-low-tide-at-twilight.md) |
 | 2026-11-21 | LIGHT THROUGH THE PINE | [2026-11-21-light-through-the-pine.md](2026-11-21-light-through-the-pine.md) |
 | 2026-11-21 | Seven Floors Up | [2026-11-21-seven-floors-up.md](2026-11-21-seven-floors-up.md) |
+| 2026-11-22 | Sunlight Across the Grain | [2026-11-22-sunlight-across-the-grain.md](2026-11-22-sunlight-across-the-grain.md) |
