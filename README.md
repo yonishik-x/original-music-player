@@ -26,7 +26,7 @@ README.md           このファイル
 - **LIGHT THROUGH THE PINE**（`audio/pine/`）— アコースティック・フォーク（100 BPM、2分58秒）
 - **Seven Floors Up**（`audio/seven/`）— ジャズポップ、ピアノ＋ストリングス（112 BPM、2分58秒）
 - **Sunlight Across the Grain**（`audio/grain/`）— アコースティック・フォーク＋ジャズピアノの和声感（110 BPM、2分57秒）
-- **BEFORE THE GALE BREAKS**（`audio/gale/`）— シーシャンティ、短調＋重厚（116 BPM、2分58秒）
+- **BEFORE THE GALE BREAKS**（`audio/gale/`）— シーシャンティ、短調＋重厚（116 BPM、2分57秒）
 
 いずれも Gemini（Lyria）で生成したインストゥルメンタル。各曲のプロンプトと音源リンクは `tracks/` に記録。
 
