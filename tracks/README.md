@@ -17,4 +17,5 @@
 | 2026-11-21 | Seven Floors Up | [2026-11-21-seven-floors-up.md](2026-11-21-seven-floors-up.md) |
 | 2026-11-21 | BEFORE THE GALE BREAKS | [2026-11-21-before-the-gale-breaks.md](2026-11-21-before-the-gale-breaks.md) |
 | 2026-11-22 | Sunlight Across the Grain | [2026-11-22-sunlight-across-the-grain.md](2026-11-22-sunlight-across-the-grain.md) |
+| 2026-11-23 | THE BOATMAN'S STEADY WATCH | [2026-11-23-the-boatmans-steady-watch.md](2026-11-23-the-boatmans-steady-watch.md) |
 | 2026-11-23 | Four Bells at Dawn | [2026-11-23-four-bells-at-dawn.md](2026-11-23-four-bells-at-dawn.md) |
