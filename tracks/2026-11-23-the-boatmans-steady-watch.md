@@ -28,4 +28,4 @@
 - Gemini会話ページ: https://gemini.google.com/app/9f4e4e56f9cf5fe1
 - Muse側の保存ファイル名: `2026-11-23-The_Boatmans_Steady_Watch.mp3`（focus-jazz-piano フォルダ、一時コピー）
 
-注: 曲名はGeminiが付けたもの（カバーアートに表示）。プレーヤーへの追加は行っていない（ユーザーの指示待ち）。
+注: 曲名はGeminiが付けたもの（カバーアートに表示）。2026-11-23にユーザーの指示でプレーヤーへ追加した（audio/boatman/）。
