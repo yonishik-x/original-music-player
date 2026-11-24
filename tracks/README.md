@@ -20,3 +20,4 @@
 | 2026-11-23 | THE BOATMAN'S STEADY WATCH | [2026-11-23-the-boatmans-steady-watch.md](2026-11-23-the-boatmans-steady-watch.md) |
 | 2026-11-23 | Four Bells at Dawn | [2026-11-23-four-bells-at-dawn.md](2026-11-23-four-bells-at-dawn.md) |
 | 2026-11-24 | THE MORNING MOMENTUM | [2026-11-24-the-morning-momentum.md](2026-11-24-the-morning-momentum.md) |
+| 2026-11-25 | Where the River Bends | [2026-11-25-where-the-river-bends.md](2026-11-25-where-the-river-bends.md) |
