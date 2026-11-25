@@ -137,6 +137,11 @@
       }
       .seek-btn svg { width: 24px; height: 24px; fill: currentColor; }
       .seek-btn:active { transform: scale(.95); }
+      .dl-progress { display: flex; align-items: center; gap: 10px; margin: -10px 0 16px; font-size: .82rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+      .dl-progress[hidden] { display: none; }
+      .dl-bar { flex: 1; height: 6px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+      .dl-fill { display: block; height: 100%; width: 0%; background: var(--accent); border-radius: 3px; transition: width .2s; }
+      .playlist-size { font-size: .82rem; color: var(--ink-soft); margin: -6px 0 14px; font-variant-numeric: tabular-nums; }
       .play-btn {
         width: 64px; height: 64px; border-radius: 50%; border: 0;
         background: var(--accent); color: var(--accent-ink);
@@ -218,6 +223,11 @@
             <span class="status-text" id="status">ボタンを押すと音源を読み込んで再生します</span>
           </div>
 
+          <div class="dl-progress" id="dlProgress" hidden>
+            <div class="dl-bar"><span class="dl-fill" id="dlFill"></span></div>
+            <span class="dl-text" id="dlText"></span>
+          </div>
+
           <h1 class="track-title" id="trackTitle">INTERSECTION AT DAYBREAK</h1>
           <p class="track-sub" id="trackSub">アップテンポ・ジャズピアノ — 仕事の集中用BGM（歌詞なし）</p>
           <div class="track-meta" id="trackMeta">
@@ -229,6 +239,7 @@
 
           <div class="playlist" id="playlist" aria-label="プレイリスト"></div>
           <p class="playlist-hint">左のつまみをドラッグすると再生順を入れ替えできます。右のスイッチで曲ごとにオン／オフを切り替え、オフの曲はプレイリスト再生から外れます。並び順とオン／オフはこの端末に保存されます。</p>
+          <p class="playlist-size" id="playlistSize"></p>
 
           <div class="controls">
             <div class="ctl">
@@ -293,6 +304,7 @@
             genre: "ジャズピアノ・124 BPM",
             chips: ["124 BPM", "ジャズピアノ＋ドラム＋ベース", "2:52"],
             len: 172.49,
+            bytes: 5602671,
             dir: "audio/daybreak/",
             drive: "https://drive.google.com/file/d/1VvekNctFUcscDtusIGKYztYJ-IAWOtye/view?usp=drivesdk",
             share: "https://share.gemini.google/jWwyIXZohye4"
@@ -304,6 +316,7 @@
             genre: "ピアノポップ・120 BPM",
             chips: ["120 BPM", "ピアノ＋ドラム＋ベース", "2:59"],
             len: 179.91,
+            bytes: 5767309,
             dir: "audio/coffee/",
             drive: "https://drive.google.com/file/d/1IqC3SHuxFQeS5UaiqLzywj5rPbTbmwAe/view",
             share: "https://share.gemini.google/GNDUMs0rT6Ic"
@@ -315,6 +328,7 @@
             genre: "ジャズピアノポップ・116 BPM",
             chips: ["116 BPM", "ピアノトリオ＋ギター", "3:00"],
             len: 180.09,
+            bytes: 5773161,
             dir: "audio/sun/",
             drive: "https://drive.google.com/file/d/1Zwc5bNfD8-7wzuDDIbVc6wwC82CsKrgY/view",
             share: "https://share.gemini.google/QNbFv401c7hS"
@@ -326,6 +340,7 @@
             genre: "ジャズピアノポップ",
             chips: ["ジャズピアノポップ", "108 BPM", "2:54"],
             len: 174.00,
+            bytes: 5578393,
             dir: "audio/porcelain/",
             drive: "https://drive.google.com/file/d/1glzUuGiv5jPmoISvY0n3jMD9v5frSp9z/view",
             share: "https://share.gemini.google/a3g4e8UiU0Oz"
@@ -337,6 +352,7 @@
             genre: "アコースティック・フォーク",
             chips: ["アコースティック・フォーク", "90 BPM", "2:39"],
             len: 159.24,
+            bytes: 5113614,
             dir: "audio/twilight/",
             drive: "https://drive.google.com/file/d/1mVy7EDPf02U-DGQxeVamtyso75pBnR-B/view",
             share: "https://share.gemini.google/vUPAff67nydC"
@@ -348,6 +364,7 @@
             genre: "アコースティック・フォーク",
             chips: ["アコースティック・フォーク", "100 BPM", "2:58"],
             len: 178.29,
+            bytes: 5715481,
             dir: "audio/pine/",
             drive: "https://drive.google.com/file/d/1tNtz8Cy_3UQpXFhA--M_LpI6bvmHOtCE/view",
             share: "https://share.gemini.google/puuA6rQfd9zs"
@@ -359,6 +376,7 @@
             genre: "ジャズポップ",
             chips: ["ジャズポップ", "112 BPM", "2:58"],
             len: 178.42,
+            bytes: 5719661,
             dir: "audio/seven/",
             drive: "https://drive.google.com/file/d/1AJLSpVG6QL8r4Wx78WjIHDhk_wkzpR7h/view",
             share: "https://share.gemini.google/KKuneimGg8qm"
@@ -370,6 +388,7 @@
             genre: "アコースティック・フォーク",
             chips: ["アコースティック・フォーク", "110 BPM", "2:57"],
             len: 177.21,
+            bytes: 5681209,
             dir: "audio/grain/",
             drive: "https://drive.google.com/file/d/1RQF52AofFquhG3NAvBVwgvHYS99orL7-/view",
             share: "https://share.gemini.google/Q3fEtC9bRxyH"
@@ -381,6 +400,7 @@
             genre: "シーシャンティ",
             chips: ["シーシャンティ", "116 BPM", "2:57"],
             len: 177.82,
+            bytes: 5700437,
             dir: "audio/gale/",
             drive: "https://drive.google.com/file/d/1fx9NaQaDZHydgafeen705yi5k8seBTzM/view",
             share: "https://share.gemini.google/tfXdWf26O2yD"
@@ -392,6 +412,7 @@
             genre: "シーシャンティ",
             chips: ["シーシャンティ", "98 BPM", "2:39"],
             len: 159.40,
+            bytes: 5111106,
             dir: "audio/boatman/",
             drive: "https://drive.google.com/file/d/1GcC9WADKQAV1TeHwg0lyGDwyAbAcbrJX/view",
             share: "https://share.gemini.google/dXjr3qEhIv81"
@@ -403,6 +424,7 @@
             genre: "ジャズピアノポップス",
             chips: ["ジャズピアノポップス", "126 BPM", "2:49"],
             len: 169.85,
+            bytes: 5445474,
             dir: "audio/momentum/",
             drive: "https://drive.google.com/file/d/12zNo7gutN2W4cEscooEd61O0FVxlPxod/view",
             share: "https://share.gemini.google/LT1FROpSfFQl"
@@ -489,6 +511,77 @@
         var pausedPos = 0;
         var fading = false, fadeOutDeck = null, fadeInDeck = null, fadeStart = 0, fadeDurMs = 0;
         var rafId = null;
+
+        /* ---------- download progress ----------
+           tr.bytes is the served size of a track's data files. Loads are
+           counted per batch: when a load starts while nothing else is
+           loading, the counters reset. */
+        function fmtMB(b) { return (b / 1000000).toFixed(1); }
+        var dlActive = 0, dlTotal = 0, dlDone = 0, dlTracksTotal = 0, dlTracksDone = 0;
+        var dlCounted = {};
+        function dlRender() {
+          var box = $("dlProgress");
+          if (!box) return;
+          if (dlActive <= 0) { box.hidden = true; return; }
+          box.hidden = false;
+          var pct = dlTotal > 0 ? Math.min(100, Math.floor(dlDone / dlTotal * 100)) : 0;
+          $("dlFill").style.width = pct + "%";
+          $("dlText").textContent = "ダウンロード中… " + dlTracksDone + "/" + dlTracksTotal + "曲・" +
+            fmtMB(dlDone) + " / " + fmtMB(dlTotal) + " MB（" + pct + "%）";
+        }
+        function dlStart(tr) {
+          if (dlActive === 0) { dlTotal = 0; dlDone = 0; dlTracksTotal = 0; dlTracksDone = 0; }
+          dlActive++; dlTotal += tr.bytes || 0; dlTracksTotal++;
+          dlCounted[tr.id] = 0;
+          dlRender();
+        }
+        function dlAdd(tr, n) {
+          dlCounted[tr.id] = (dlCounted[tr.id] || 0) + n;
+          dlDone += n;
+          dlRender();
+        }
+        function dlFinish(tr, ok) {
+          if (ok) { dlTracksDone++; }
+          else {
+            dlDone -= dlCounted[tr.id] || 0;
+            dlTotal -= tr.bytes || 0;
+            dlTracksTotal--;
+          }
+          dlCounted[tr.id] = 0;
+          dlActive--;
+          dlRender();
+        }
+        function fetchTextCounted(tr, url) {
+          return fetch(url).then(function (r) {
+            if (!r.ok) throw new Error("fetch failed: " + url);
+            if (!r.body || !r.body.getReader) {
+              return r.text().then(function (t) { dlAdd(tr, t.length); return t; });
+            }
+            var reader = r.body.getReader();
+            var dec = new TextDecoder();
+            var out = "";
+            function step() {
+              return reader.read().then(function (res) {
+                if (res.done) return out;
+                dlAdd(tr, res.value.byteLength);
+                out += dec.decode(res.value, { stream: true });
+                return step();
+              });
+            }
+            return step();
+          });
+        }
+        function updateSizeInfo() {
+          var el = $("playlistSize");
+          if (!el) return;
+          var all = 0, on = 0, onCount = 0;
+          TRACKS.forEach(function (tr, i) {
+            all += tr.bytes || 0;
+            if (isEnabled(i)) { on += tr.bytes || 0; onCount++; }
+          });
+          el.textContent = "プレイリスト全" + TRACKS.length + "曲の合計は " + fmtMB(all) +
+            " MB です。オンの " + onCount + " 曲で " + fmtMB(on) + " MB を読み込みます。";
+        }
 
         function setStatus(msg, isErr) {
           statusEl.textContent = msg;
@@ -762,16 +855,11 @@
           var tr = TRACKS[idx];
           if (loadedUrls[tr.id]) return Promise.resolve(loadedUrls[tr.id]);
           if (loadPromises[tr.id]) return loadPromises[tr.id];
-          loadPromises[tr.id] = fetch(tr.dir + "parts.txt").then(function (r) {
-            if (!r.ok) throw new Error("fetch failed");
-            return r.text();
-          }).then(function (list) {
+          dlStart(tr);
+          loadPromises[tr.id] = fetchTextCounted(tr, tr.dir + "parts.txt").then(function (list) {
             var names = list.split(/\s+/).filter(function (x) { return x; });
             return Promise.all(names.map(function (nm) {
-              return fetch(tr.dir + nm).then(function (r) {
-                if (!r.ok) throw new Error("fetch failed: " + nm);
-                return r.text();
-              });
+              return fetchTextCounted(tr, tr.dir + nm);
             })).then(function (chunks) { return chunks.join(""); });
           }).then(function (b64) {
             var clean = b64.replace(/\s+/g, "");
@@ -795,8 +883,9 @@
             }
             var blob = new Blob([bytes.subarray(0, n)], { type: "audio/mpeg" });
             loadedUrls[tr.id] = URL.createObjectURL(blob);
+            dlFinish(tr, true);
             return loadedUrls[tr.id];
-          }).catch(function (e) { loadPromises[tr.id] = null; throw e; });
+          }).catch(function (e) { dlFinish(tr, false); loadPromises[tr.id] = null; throw e; });
           return loadPromises[tr.id];
         }
 
@@ -1081,6 +1170,7 @@
               toggle.setAttribute("aria-pressed", enabledById[tr.id] ? "true" : "false");
               row.classList.toggle("off", !enabledById[tr.id]);
               saveState();
+              updateSizeInfo();
               if (enabledById[tr.id]) {
                 loadTrackSource(idx).catch(function () {});
               }
@@ -1094,6 +1184,7 @@
             playlistEl.appendChild(row);
           });
           renumberRows();
+          updateSizeInfo();
         }
 
         /* drag & drop reordering via pointer events (mouse + touch) */
