@@ -63,31 +63,10 @@
         box-shadow: var(--shadow);
         padding: 26px 22px 22px;
         display: grid;
-        grid-template-columns: 168px 1fr;
+        grid-template-columns: 1fr;
         gap: 26px;
         align-items: center;
       }
-      .disc-zone { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-      .disc {
-        width: 168px; height: 168px; border-radius: 50%;
-        background:
-          radial-gradient(circle at 50% 50%, var(--accent) 0 17%, #171310 17.5% 18.5%, transparent 19%),
-          repeating-radial-gradient(circle at 50% 50%, var(--disc) 0 3px, var(--disc-ring) 3px 4px);
-        border: 1px solid var(--disc-ring);
-        box-shadow: inset 0 0 0 6px rgba(0,0,0,.25), 0 8px 22px rgba(0,0,0,.28);
-        position: relative;
-        animation: spin 14s linear infinite;
-        animation-play-state: paused;
-      }
-      .disc.playing { animation-play-state: running; }
-      .disc::after {
-        content: ""; position: absolute; inset: 0; border-radius: 50%;
-        background: conic-gradient(from 210deg, transparent 0deg, rgba(255,255,255,.10) 24deg, transparent 60deg, transparent 180deg, rgba(255,255,255,.06) 210deg, transparent 250deg);
-      }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) { .disc { animation: none; } }
-      .loop-count { font-size: .82rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-      .loop-count b { color: var(--ink); font-size: .95rem; }
 
       .track-head { min-width: 0; }
       .track-title {
@@ -150,7 +129,14 @@
       .progress .rail { width: 100%; height: 6px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
       .progress .fill { height: 100%; width: 0%; background: var(--accent); border-radius: 3px; }
 
-      .transport { display: flex; align-items: center; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+      .transport { display: flex; align-items: center; gap: 14px; margin: 12px 0 20px; flex-wrap: wrap; }
+      .seek-btn {
+        width: 44px; height: 44px; border-radius: 50%;
+        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+        display: grid; place-items: center;
+      }
+      .seek-btn svg { width: 24px; height: 24px; fill: currentColor; }
+      .seek-btn:active { transform: scale(.95); }
       .play-btn {
         width: 64px; height: 64px; border-radius: 50%; border: 0;
         background: var(--accent); color: var(--accent-ink);
@@ -185,55 +171,16 @@
       }
       .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
 
-      /* ---------- Timer ---------- */
-      .timer {
-        margin-top: 22px;
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        box-shadow: var(--shadow);
-        padding: 24px 22px;
-        display: grid; grid-template-columns: 168px 1fr; gap: 26px; align-items: center;
-      }
-      .ring-zone { display: flex; justify-content: center; }
-      .ring-wrap { position: relative; width: 168px; height: 168px; }
-      .ring-wrap svg { transform: rotate(-90deg); display: block; }
-      .ring-bg { stroke: var(--surface-2); }
-      .ring-fg { stroke: var(--accent); transition: stroke .4s; }
-      .timer.break .ring-fg { stroke: var(--good); }
-      .ring-center {
-        position: absolute; inset: 0; display: flex; flex-direction: column;
-        align-items: center; justify-content: center; gap: 2px;
-      }
-      .ring-time { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
-      .ring-phase { font-size: .85rem; font-weight: 700; color: var(--accent-strong); letter-spacing: .12em; }
-      .timer.break .ring-phase { color: var(--good); }
-      .timer h2 {
-        font-family: "Shippori Mincho B1", "Hiragino Mincho ProN", serif;
-        font-size: 1.3rem; margin: 0 0 6px; font-weight: 800;
-      }
-      .timer p.desc { margin: 0 0 14px; color: var(--ink-soft); font-size: .9rem; }
-      .timer .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-      .timer .row .lbl { font-size: .8rem; font-weight: 700; color: var(--ink-soft); min-width: 3.2em; }
-      .btn {
-        border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
-        border-radius: 10px; padding: 6px 16px; font-size: .92rem;
-      }
-      .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; min-width: 7.5em; }
-      .timer-stats { font-size: .88rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-      .timer-stats b { color: var(--ink); }
 
       .about { margin-top: 22px; color: var(--ink-soft); font-size: .88rem; }
       .about a { color: var(--accent-strong); }
       .about p { margin: 0 0 6px; }
 
       @media (max-width: 620px) {
-        .player, .timer { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+        .player { grid-template-columns: 1fr; justify-items: center; text-align: center; }
         .track-head { width: 100%; }
-        .track-meta, .transport, .timer .row { justify-content: center; }
+        .track-meta, .transport { justify-content: center; }
         .controls { grid-template-columns: 1fr; text-align: left; width: 100%; }
-        .timer-body { width: 100%; }
-        .timer .row .lbl { min-width: 0; }
         .pl-main { text-align: left; }
       }
     </style>
@@ -242,23 +189,7 @@
     <main class="wrap">
 
       <section class="player" aria-label="BGMプレーヤー">
-        <div class="disc-zone">
-          <div class="disc" id="disc" aria-hidden="true"></div>
-          <div class="loop-count">ループ <b id="loopCount">0</b> 回</div>
-        </div>
-
         <div class="track-head">
-          <div class="playlist" id="playlist" aria-label="プレイリスト"></div>
-          <p class="playlist-hint">左のつまみをドラッグすると再生順を入れ替えできます。右のスイッチで曲ごとにオン／オフを切り替え、オフの曲はプレイリスト再生から外れます。並び順とオン／オフはこの端末に保存されます。</p>
-          <h1 class="track-title" id="trackTitle">INTERSECTION AT DAYBREAK</h1>
-          <p class="track-sub" id="trackSub">アップテンポ・ジャズピアノ — 仕事の集中用BGM（歌詞なし）</p>
-          <div class="track-meta" id="trackMeta">
-            <span class="chip">124 BPM</span>
-            <span class="chip">ジャズピアノ＋ドラム＋ベース</span>
-            <span class="chip">2:52</span>
-            <span class="chip loop">ループ再生対応</span>
-          </div>
-
           <div class="progress-row">
             <span id="timeNow">0:00</span>
             <button class="progress" id="progress" aria-label="再生位置を変更">
@@ -271,15 +202,33 @@
             <button class="skip-btn" id="prevBtn" aria-label="前の曲">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2.2v14H6zM20 5.5v13L9.8 12z"/></svg>
             </button>
+            <button class="seek-btn" id="back15Btn" aria-label="15秒戻る">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="15.6" text-anchor="middle" font-size="6.5" font-weight="700">15</text></svg>
+            </button>
             <button class="play-btn" id="playBtn" aria-label="再生">
               <svg id="iconPlay" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
               <svg id="iconPause" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z"/></svg>
+            </button>
+            <button class="seek-btn" id="fwd15Btn" aria-label="15秒進む">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="translate(24 0) scale(-1 1)"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></g><text x="12" y="15.6" text-anchor="middle" font-size="6.5" font-weight="700">15</text></svg>
             </button>
             <button class="skip-btn" id="nextBtn" aria-label="次の曲">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.8 5H18v14h-2.2zM4 5.5v13L14.2 12z"/></svg>
             </button>
             <span class="status-text" id="status">ボタンを押すと音源を読み込んで再生します</span>
           </div>
+
+          <h1 class="track-title" id="trackTitle">INTERSECTION AT DAYBREAK</h1>
+          <p class="track-sub" id="trackSub">アップテンポ・ジャズピアノ — 仕事の集中用BGM（歌詞なし）</p>
+          <div class="track-meta" id="trackMeta">
+            <span class="chip">124 BPM</span>
+            <span class="chip">ジャズピアノ＋ドラム＋ベース</span>
+            <span class="chip">2:52</span>
+            <span class="chip loop">ループ再生対応</span>
+          </div>
+
+          <div class="playlist" id="playlist" aria-label="プレイリスト"></div>
+          <p class="playlist-hint">左のつまみをドラッグすると再生順を入れ替えできます。右のスイッチで曲ごとにオン／オフを切り替え、オフの曲はプレイリスト再生から外れます。並び順とオン／オフはこの端末に保存されます。</p>
 
           <div class="controls">
             <div class="ctl">
@@ -313,44 +262,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section class="timer" id="timerCard" aria-label="集中タイマー">
-        <div class="ring-zone">
-          <div class="ring-wrap">
-            <svg width="168" height="168" viewBox="0 0 168 168" aria-hidden="true">
-              <circle class="ring-bg" cx="84" cy="84" r="76" fill="none" stroke-width="10"/>
-              <circle class="ring-fg" id="ringFg" cx="84" cy="84" r="76" fill="none" stroke-width="10"
-                      stroke-linecap="round" stroke-dasharray="477.5" stroke-dashoffset="0"/>
-            </svg>
-            <div class="ring-center">
-              <div class="ring-phase" id="phaseLabel">集中</div>
-              <div class="ring-time" id="ringTime">25:00</div>
-            </div>
-          </div>
-        </div>
-        <div class="timer-body">
-          <h2>集中タイマー</h2>
-          <p class="desc">集中と休憩を自動で切り替えます。切り替わるときに小さな合図音が鳴ります（BGMはそのまま流れ続けます）。</p>
-          <div class="row">
-            <span class="lbl">集中</span>
-            <div class="seg" id="focusSeg" role="group" aria-label="集中時間">
-              <button data-min="15" aria-pressed="false">15分</button>
-              <button data-min="25" aria-pressed="true">25分</button>
-              <button data-min="50" aria-pressed="false">50分</button>
-            </div>
-            <span class="lbl">休憩</span>
-            <div class="seg" id="breakSeg" role="group" aria-label="休憩時間">
-              <button data-min="5" aria-pressed="true">5分</button>
-              <button data-min="10" aria-pressed="false">10分</button>
-            </div>
-          </div>
-          <div class="row">
-            <button class="btn primary" id="timerBtn">タイマー開始</button>
-            <button class="btn" id="timerReset">リセット</button>
-          </div>
-          <div class="timer-stats">完了した集中セッション： <b id="sessionsDone">0</b> 回　／　今日の集中時間： <b id="focusTotal">0分</b></div>
         </div>
       </section>
 
@@ -555,11 +466,6 @@
           var m = Math.floor(sec / 60), s = sec % 60;
           return m + ":" + (s < 10 ? "0" : "") + s;
         }
-        function fmtMS(ms) {
-          var sec = Math.max(0, Math.ceil(ms / 1000));
-          var m = Math.floor(sec / 60), s = sec % 60;
-          return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
-        }
 
         /* ============ Player (in-repo audio, dual-deck crossfade) ============
            Google Drive's download endpoints answer as file downloads
@@ -569,8 +475,8 @@
            fetched from the same origin, decoded to a Blob, and played via
            an object URL. Two HTMLAudioElements crossfade by .volume. */
         var playBtn = $("playBtn"), iconPlay = $("iconPlay"), iconPause = $("iconPause"),
-            statusEl = $("status"), disc = $("disc"), fill = $("fill"),
-            timeNow = $("timeNow"), loopCountEl = $("loopCount");
+            statusEl = $("status"), fill = $("fill"),
+            timeNow = $("timeNow");
 
         var decks = [$("audioA"), $("audioB")];
         var activeIdx = 0;
@@ -592,7 +498,6 @@
           iconPlay.style.display = state === "playing" ? "none" : "";
           iconPause.style.display = state === "playing" ? "" : "none";
           playBtn.setAttribute("aria-label", state === "playing" ? "一時停止" : "再生");
-          disc.classList.toggle("playing", state === "playing");
         }
         function activeDeck() { return decks[activeIdx]; }
         function idleDeck() { return decks[1 - activeIdx]; }
@@ -716,7 +621,6 @@
           fadeDurMs = Math.max(60, xf * 1000);
           TRACK_LEN = TRACKS[target].len;
           loopCount++;
-          loopCountEl.textContent = loopCount;
         }
         function settleActiveDeck() {
           var ti = deckTrack[activeIdx];
@@ -766,7 +670,6 @@
           out.volume = 0;
           activeIdx = 1 - activeIdx;
           loopCount++;
-          loopCountEl.textContent = loopCount;
           settleActiveDeck();
         }
         function finishPlaylist() {
@@ -935,7 +838,6 @@
           playBtn.disabled = false;
           pausedPos = 0;
           loopCount = 0;
-          loopCountEl.textContent = "0";
           stopProgress();
           renderTrackUI(idx);
           deckTrack[activeIdx] = idx;
@@ -1016,7 +918,6 @@
 
         /* play / pause */
         playBtn.addEventListener("click", function () {
-          unlockChime();
           if (state === "playing") { pausePlayback(); return; }
           if (state === "loading") return;
           if (!isEnabled(curTrack)) {
@@ -1064,6 +965,22 @@
           if (state === "paused") setStatus("一時停止中（" + fmt(pos) + "）");
         });
 
+        /* seek ±15 seconds */
+        function seekBy(delta) {
+          if (state !== "playing" && state !== "paused") return;
+          if (fading) cancelCrossfade(false);
+          var d = activeDeck();
+          var dur = deckDuration(d);
+          var pos = (d.currentTime || pausedPos || 0) + delta;
+          pos = Math.min(Math.max(0, pos), Math.max(0, dur - 0.1));
+          try { d.currentTime = pos; } catch (e) {}
+          pausedPos = pos;
+          drawProgress(pos);
+          if (state === "paused") setStatus("一時停止中（" + fmt(pos) + "）");
+        }
+        $("back15Btn").addEventListener("click", function () { seekBy(-15); });
+        $("fwd15Btn").addEventListener("click", function () { seekBy(15); });
+
         /* volume */
         $("vol").addEventListener("input", function () {
           volume = this.value / 100;
@@ -1071,7 +988,7 @@
           if (!fading) activeDeck().volume = volume;
         });
 
-        /* segmented controls (shared with the timer below) */
+        /* segmented controls */
         function segWire(segId, attr, fn) {
           var seg = $(segId);
           seg.addEventListener("click", function (ev) {
@@ -1238,125 +1155,8 @@
           });
         })();
 
-        /* chime context (timer signal only; unrelated to the track) */
-        var chimeCtx = null;
-        function unlockChime() {
-          try {
-            if (!chimeCtx) {
-              var AC = window.AudioContext || window.webkitAudioContext;
-              if (!AC) return;
-              chimeCtx = new AC();
-            }
-            if (chimeCtx.state === "suspended") chimeCtx.resume();
-          } catch (e) {}
-        }
-
-        /* ================= Focus timer ================= */
-        var RING_LEN = 477.5;
-        var timer = {
-          phase: "focus", running: false,
-          focusMin: 25, breakMin: 5,
-          totalMs: 25 * 60000, remainMs: 25 * 60000, endAt: 0,
-          sessions: 0, focusDoneMs: 0, phaseStartRemain: 25 * 60000,
-          tick: null
-        };
-        var ringFg = $("ringFg"), ringTime = $("ringTime"), phaseLabel = $("phaseLabel"),
-            timerCard = $("timerCard"), timerBtn = $("timerBtn");
-
-        function chime() {
-          try {
-            unlockChime();
-            if (!chimeCtx) throw new Error("no-audio");
-            var t0 = chimeCtx.currentTime + 0.02;
-            [[880, 0], [659.25, 0.22]].forEach(function (pair) {
-              var o = chimeCtx.createOscillator(), g = chimeCtx.createGain();
-              o.type = "sine"; o.frequency.value = pair[0];
-              g.gain.setValueAtTime(0.0001, t0 + pair[1]);
-              g.gain.exponentialRampToValueAtTime(0.12, t0 + pair[1] + 0.03);
-              g.gain.exponentialRampToValueAtTime(0.0001, t0 + pair[1] + 0.5);
-              o.connect(g); g.connect(chimeCtx.destination);
-              o.start(t0 + pair[1]); o.stop(t0 + pair[1] + 0.55);
-            });
-          } catch (e) {}
-          if (navigator.vibrate) navigator.vibrate(120);
-        }
-
-        function drawTimer() {
-          ringTime.textContent = fmtMS(timer.remainMs);
-          var frac = timer.totalMs > 0 ? timer.remainMs / timer.totalMs : 0;
-          ringFg.style.strokeDashoffset = String(RING_LEN * (1 - frac));
-          phaseLabel.textContent = timer.phase === "focus" ? "集中" : "休憩";
-          timerCard.classList.toggle("break", timer.phase === "break");
-          $("sessionsDone").textContent = timer.sessions;
-          $("focusTotal").textContent = Math.floor(timer.focusDoneMs / 60000) + "分";
-        }
-        function setPhase(phase) {
-          timer.phase = phase;
-          timer.totalMs = (phase === "focus" ? timer.focusMin : timer.breakMin) * 60000;
-          timer.remainMs = timer.totalMs;
-          timer.phaseStartRemain = timer.remainMs;
-        }
-        function timerTick() {
-          timer.remainMs = Math.max(0, timer.endAt - Date.now());
-          if (timer.phase === "focus") {
-            var elapsedInPhase = timer.phaseStartRemain - timer.remainMs;
-            timer.focusDoneMs = timer.focusBase + elapsedInPhase;
-          }
-          if (timer.remainMs <= 0) {
-            if (timer.phase === "focus") {
-              timer.sessions++;
-              timer.focusDoneMs = timer.focusBase + timer.phaseStartRemain;
-              setPhase("break");
-            } else {
-              timer.focusBase = timer.focusDoneMs;
-              setPhase("focus");
-            }
-            timer.endAt = Date.now() + timer.remainMs;
-            chime();
-          }
-          drawTimer();
-        }
-        timer.focusBase = 0;
-
-        function applyDurations() {
-          if (timer.running) return;
-          setPhase(timer.phase);
-          timer.focusBase = timer.focusDoneMs;
-          drawTimer();
-        }
-        segWire("focusSeg", "data-min", function (v) { timer.focusMin = v; if (timer.phase === "focus") applyDurations(); });
-        segWire("breakSeg", "data-min", function (v) { timer.breakMin = v; if (timer.phase === "break") applyDurations(); });
-
-        timerBtn.addEventListener("click", function () {
-          if (timer.running) {
-            timer.running = false;
-            clearInterval(timer.tick);
-            timer.remainMs = Math.max(0, timer.endAt - Date.now());
-            if (timer.phase === "focus") timer.focusDoneMs = timer.focusBase + (timer.phaseStartRemain - timer.remainMs);
-            timerBtn.textContent = "タイマー再開";
-            drawTimer();
-          } else {
-            timer.running = true;
-            timer.focusBase = timer.focusDoneMs;
-            timer.phaseStartRemain = timer.remainMs;
-            timer.endAt = Date.now() + timer.remainMs;
-            timer.tick = setInterval(timerTick, 250);
-            timerBtn.textContent = "一時停止";
-            unlockChime(); // unlock audio for the chime
-          }
-        });
-        $("timerReset").addEventListener("click", function () {
-          timer.running = false;
-          clearInterval(timer.tick);
-          timer.focusBase = timer.focusDoneMs;
-          setPhase("focus");
-          timerBtn.textContent = "タイマー開始";
-          drawTimer();
-        });
-
         /* ================= init ================= */
         buildPlaylist();
-        drawTimer();
         applyTrack(firstEnabledInOrder() >= 0 ? firstEnabledInOrder() : 0);
 
         /* Preload every enabled track as soon as the page opens, so
