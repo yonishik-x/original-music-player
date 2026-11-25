@@ -21,3 +21,4 @@
 | 2026-11-23 | Four Bells at Dawn | [2026-11-23-four-bells-at-dawn.md](2026-11-23-four-bells-at-dawn.md) |
 | 2026-11-24 | THE MORNING MOMENTUM | [2026-11-24-the-morning-momentum.md](2026-11-24-the-morning-momentum.md) |
 | 2026-11-25 | Where the River Bends | [2026-11-25-where-the-river-bends.md](2026-11-25-where-the-river-bends.md) |
+| 2026-11-26 | OLD TIMBER DECK | [2026-11-26-old-timber-deck.md](2026-11-26-old-timber-deck.md) |
