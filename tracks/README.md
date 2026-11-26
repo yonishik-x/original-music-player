@@ -22,3 +22,4 @@
 | 2026-11-24 | THE MORNING MOMENTUM | [2026-11-24-the-morning-momentum.md](2026-11-24-the-morning-momentum.md) |
 | 2026-11-25 | Where the River Bends | [2026-11-25-where-the-river-bends.md](2026-11-25-where-the-river-bends.md) |
 | 2026-11-26 | OLD TIMBER DECK | [2026-11-26-old-timber-deck.md](2026-11-26-old-timber-deck.md) |
+| 2026-11-27 | Sunlight on the Drafting Table | [2026-11-27-sunlight-on-the-drafting-table.md](2026-11-27-sunlight-on-the-drafting-table.md) |
