@@ -29,6 +29,7 @@ README.md           このファイル
 - **BEFORE THE GALE BREAKS**（`audio/gale/`）— シーシャンティ、短調＋重厚（116 BPM、2分57秒）
 - **THE BOATMAN'S STEADY WATCH**（`audio/boatman/`）— シーシャンティ、ゆっくり版（98 BPM、2分39秒）
 - **THE MORNING MOMENTUM**（`audio/momentum/`）— ジャズピアノポップス（126 BPM、2分49秒）
+- **Sunlight on the Drafting Table**（`audio/drafting/`）— ジャズピアノポップス（108 BPM、2分53秒）
 
 いずれも Gemini（Lyria）で生成したインストゥルメンタル。各曲のプロンプトと音源リンクは `tracks/` に記録。
 
